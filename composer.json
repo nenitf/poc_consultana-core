@@ -1,0 +1,24 @@
+{
+    "scripts": {
+        "test": "php tests/_tools/composer-phpunit.php",
+        "test:filter": "php tests/_tools/composer-phpunit.php --filter",
+        "test:group": "php tests/_tools/composer-test.php --group",
+        "test:cover": "php tests/_tools/composer-phpunit.php --coverage-text --coverage-html tests/_reports/coverage",
+        "test:dox": "php tests/_tools/composer-phpunit.php --testdox",
+        "test:dox:filter": "php tests/_tools/composer-phpunit.php --filter --testdox",
+        "test:dox:group": "php tests/_tools/composer-test.php --testdox --group",
+        "test:dox:cover": "php tests/_tools/composer-phpunit.php --coverage-text --coverage-html tests/_reports/coverage --testdox"
+    },
+    "autoload": {
+        "psr-4":{
+            "Core\\Contracts\\": "Contracts/",
+            "Core\\Exceptions\\": "Exceptions/",
+            "Core\\Models\\": "Models/",
+            "Core\\UseCases\\": "UseCases/",
+            "Core\\Tests\\": "Tests/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8.5"
+    }
+}

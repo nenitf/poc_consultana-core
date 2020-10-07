@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    bootstrap="vendor/autoload.php"
+    colors="true"
+    verbose="true"
+    backupGlobals="false"
+    backupStaticAttributes="false"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    stopOnError="false"
+    stopOnFailure="false"
+    stopOnIncomplete="false"
+    stopOnSkipped="false"
+    stopOnRisky="false"
+    beStrictAboutTestsThatDoNotTestAnything="true"
+    beStrictAboutTodoAnnotatedTests="true"
+    processIsolation="false"
+    >
+    <testsuite name="Default tests">
+        <directory suffix="Test.php">tests</directory>
+        <directory suffix="Test.php">UseCases</directory>
+    </testsuite>
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix="UseCase.php">UseCases</directory>
+            <directory suffix=".php">Models</directory>
+        </whitelist>
+    </filter>
+</phpunit>
