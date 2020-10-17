@@ -10,19 +10,19 @@ use Core\Models\Agendamento;
 
 use Core\Contracts\Repositories\{
     IAgendamentosRepository,
-    IHorariosDisponiveisRepository,
+    IMedicosRepository,
 };
 
-class CriacaoAgendamentoUseCase {
+class CriacaoAgendamento {
     private $agendamentosRepository;
-    private $horariosDisponiveisRepository;
+    private $medicosRepository;
 
     public function __construct(
         IAgendamentosRepository $agendamentosRepository,
-        IHorariosDisponiveisRepository $horariosDisponiveisRepository
+        IMedicosRepository $horariosDisponiveisRepository
     ) {
         $this->agendamentosRepository = $agendamentosRepository;
-        $this->horariosDisponiveisRepository = $horariosDisponiveisRepository;
+        $this->medicosRepository = $horariosDisponiveisRepository;
     }
 
     public function execute(CriacaoAgendamentoDTO $dto)
@@ -31,15 +31,19 @@ class CriacaoAgendamentoUseCase {
             throw new AppException("Faltam parâmetros para criar agendamento");
         }
 
-        $horariosUteis = $this->horariosDisponiveisRepository->findByMedico(
-            $dto->getIdMedico()
-        );
+        $medico = $this->medicosRepository->findById($dto->getIdMedico());
+
+        $horariosUteis = $medico->getHorariosDisponiveis();
 
         $horarioTrabalhavel = false;
         $diaSemana = intval($dto->getDia()->format('w'));
         foreach($horariosUteis as $horario){
-            $horaInicio = new \DateTime($dto->getDia()->format('Y-m-d')." ".$horario->getInicio());
-            $horaFim = new \DateTime($dto->getDia()->format('Y-m-d')." ".$horario->getFim());
+            $horaInicio = new \DateTime(
+                $dto->getDia()->format('Y-m-d')." ".$horario->getInicio()
+            );
+            $horaFim = new \DateTime(
+                $dto->getDia()->format('Y-m-d')." ".$horario->getFim()
+            );
             if($horario->getDiaSemana() === $diaSemana
                 && $horaInicio <= $dto->getDia()
                 && $horaFim >= $dto->getDia()){
@@ -47,13 +51,16 @@ class CriacaoAgendamentoUseCase {
                 break;
             }
         }
-        if(!$horarioTrabalhavel){
+
+      if(!$horarioTrabalhavel){
             throw new AppException("Médico não consulta nesse horário");
         }
 
         $horaInicio = $dto->getDia();
         $horaFim = clone $dto->getDia(); // não passa referência da variável
-        $horaFim->add(new \DateInterval("PT".$dto->getDuracao()."M")); //PT40M -> +40 minutos
+
+        //PT40M -> +40 minutos
+        $horaFim->add(new \DateInterval("PT".$dto->getDuracao()."M"));
         $horariosAgendados = $this->agendamentosRepository->findByIntervalo(
             $horaInicio, $horaFim
         );

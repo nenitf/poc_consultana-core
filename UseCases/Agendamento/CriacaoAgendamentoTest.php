@@ -1,19 +1,22 @@
 <?php
 
-use Core\UseCases\Agendamento\CriacaoAgendamentoUseCase;
+use Core\UseCases\Agendamento\CriacaoAgendamento;
 use Core\UseCases\Agendamento\CriacaoAgendamentoDTO;
 
-use Core\Models\HorarioDisponivel;
+use Core\Models\{
+    Medico,
+    HorarioDisponivel,
+};
 
 use Core\Contracts\Repositories\{
     IAgendamentosRepository,
-    IHorariosDisponiveisRepository,
+    IMedicosRepository,
 };
 
-class CriacaoAgendamentoUseCaseTest extends \PHPUnit\Framework\TestCase
+class CriacaoAgendamentoTest extends \PHPUnit\Framework\TestCase
 {
     private $doubleAgendamentosRepository;
-    private $doubleHorariosDisponiveisRepository;
+    private $doubleMedicosRepository;
 
     protected function setUp(): void
     {
@@ -26,16 +29,16 @@ class CriacaoAgendamentoUseCaseTest extends \PHPUnit\Framework\TestCase
         $this->doubleAgendamentosRepository = $this->createMock(
             IAgendamentosRepository::class
         );
-        $this->doubleHorariosDisponiveisRepository = $this->createMock(
-            IHorariosDisponiveisRepository::class
+        $this->doubleMedicosRepository = $this->createMock(
+            IMedicosRepository::class
         );
     }
 
     public function newSut()
     {
-        return new CriacaoAgendamentoUseCase(
+        return new CriacaoAgendamento(
             $this->doubleAgendamentosRepository,
-            $this->doubleHorariosDisponiveisRepository,
+            $this->doubleMedicosRepository,
         );
     }
 
@@ -45,6 +48,16 @@ class CriacaoAgendamentoUseCaseTest extends \PHPUnit\Framework\TestCase
         return $horario1->setDiaSemana(2)
                         ->setInicio("8:00")
                         ->setFim("18:00");
+    }
+
+    private function newMedico($idMedico, $horariosDisponiveis)
+    {
+        $medico = new Medico();
+        return $medico->setId($idMedico)
+                      ->setHorariosDisponiveis([
+                          $this->newHorarioDisponivel("8:00", "18:00"),
+                          $this->newHorarioDisponivel("09:00", "14:00")
+                      ]);
     }
 
     private function newDTO($idMedico, $idPaciente, $dia, $duracao)
@@ -58,13 +71,18 @@ class CriacaoAgendamentoUseCaseTest extends \PHPUnit\Framework\TestCase
 
     public function testDeveAgendarConsulta()
     {
-        $this->doubleHorariosDisponiveisRepository
+        $medico = $this->newMedico(
+            123456,
+            [
+                $this->newHorarioDisponivel("8:00", "18:00"),
+                $this->newHorarioDisponivel("09:00", "14:00")
+            ]
+        );
+
+        $this->doubleMedicosRepository
              ->expects($this->once())
-             ->method('findByMedico')
-             ->willReturn([
-                 $this->newHorarioDisponivel("8:00", "18:00"),
-                 $this->newHorarioDisponivel("09:00", "14:00")
-             ]);
+             ->method('findById')
+             ->willReturn($medico);
 
         $this->doubleAgendamentosRepository
              ->expects($this->once())
@@ -81,7 +99,9 @@ class CriacaoAgendamentoUseCaseTest extends \PHPUnit\Framework\TestCase
 
         $sut = $this->newSut();
 
-        $dto = $this->newDTO(3, 54, new \DateTime('2020-10-06T09:30'), 30);
+        $dto = $this->newDTO(
+            $medico->getId(), 54, new \DateTime('2020-10-06T09:30'), 30
+        );
 
         $sut->execute($dto);
     }

@@ -12,7 +12,7 @@ class HorarioDisponivel
         return $this->diaSemana;
     }
 
-    public function setDiaSemana($diaSemana) {
+    public function setDiaSemana(int $diaSemana) {
         $this->diaSemana = $diaSemana;
         return $this;
     }
@@ -21,7 +21,7 @@ class HorarioDisponivel
         return $this->inicio;
     }
 
-    public function setInicio($inicio) {
+    public function setInicio(string $inicio) {
         $this->inicio = $inicio;
         return $this;
     }
@@ -30,7 +30,7 @@ class HorarioDisponivel
         return $this->fim;
     }
 
-    public function setFim($fim) {
+    public function setFim(string $fim) {
         $this->fim = $fim;
         return $this;
     }
