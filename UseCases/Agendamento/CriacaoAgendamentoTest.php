@@ -1,7 +1,9 @@
 <?php
 
-use Core\UseCases\Agendamento\CriacaoAgendamento;
-use Core\UseCases\Agendamento\CriacaoAgendamentoDTO;
+use Core\UseCases\Agendamento\{
+    CriacaoAgendamento,
+    CriacaoAgendamentoDTO,
+};
 
 use Core\Models\{
     Medico,
@@ -42,22 +44,24 @@ class CriacaoAgendamentoTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function newHorarioDisponivel($inicio, $fim)
+    private function newHorarioDisponivel($inicio, $fim)
     {
         $horario1 = new HorarioDisponivel();
         return $horario1->setDiaSemana(2)
-                        ->setInicio("8:00")
-                        ->setFim("18:00");
+                        ->setInicio($inicio)
+                        ->setFim($fim);
     }
 
-    private function newMedico($idMedico, $horariosDisponiveis)
+    private function newMedico($id, $nome, $horariosDisponiveis)
     {
         $medico = new Medico();
-        return $medico->setId($idMedico)
-                      ->setHorariosDisponiveis([
-                          $this->newHorarioDisponivel("8:00", "18:00"),
-                          $this->newHorarioDisponivel("09:00", "14:00")
-                      ]);
+        $medico->setId($id)
+               ->setNome($nome);
+
+        if(is_array($horariosDisponiveis)){
+            $medico->setHorariosDisponiveis(...$horariosDisponiveis);
+        }
+        return $medico;
     }
 
     private function newDTO($idMedico, $idPaciente, $dia, $duracao)
@@ -73,6 +77,7 @@ class CriacaoAgendamentoTest extends \PHPUnit\Framework\TestCase
     {
         $medico = $this->newMedico(
             123456,
+            "Robson",
             [
                 $this->newHorarioDisponivel("8:00", "18:00"),
                 $this->newHorarioDisponivel("09:00", "14:00")
