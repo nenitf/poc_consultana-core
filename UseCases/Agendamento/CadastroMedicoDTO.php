@@ -1,10 +1,12 @@
 <?php
 
-namespace Core\Models;
+namespace Core\UseCases\Agendamento;
+
+use Core\Exceptions\ValidationException;
 
 use Core\Models\HorarioDisponivel;
 
-class Medico
+class CadastroMedicoDTO
 {
     private $id;
     private $nome;
@@ -19,24 +21,31 @@ class Medico
         return $this;
     }
 
+    public function getNome() {
+        return $this->nome;
+    }
+
+    public function setNome(string $nome) {
+        $this->nome = $nome;
+        return $this;
+    }
+
     public function getHorariosDisponiveis() {
         return $this->horariosDisponiveis;
     }
 
     public function setHorariosDisponiveis(
         HorarioDisponivel ...$horariosDisponiveis
-    ){
+    ) {
         $this->horariosDisponiveis = $horariosDisponiveis;
+
         return $this;
     }
 
-    public function getNome() {
-        return $this->nome;
-    }
-
-    public function setNome($nome) {
-        $this->nome = $nome;
-        return $this;
+    public function valida()
+    {
+        if(is_null($this->nome))
+            throw new ValidationException('Nome é obrigatório');
     }
 }
 
