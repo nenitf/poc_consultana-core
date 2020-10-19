@@ -9,6 +9,7 @@ class Medico
     private $id;
     private $nome;
     private $horariosDisponiveis;
+    private $desativado;
 
     public function getId() {
         return $this->id;
@@ -36,6 +37,15 @@ class Medico
 
     public function setNome($nome) {
         $this->nome = $nome;
+        return $this;
+    }
+
+    public function getDesativado() {
+        return $this->desativado;
+    }
+
+    public function setDesativado(bool $desativado) {
+        $this->desativado = $desativado;
         return $this;
     }
 }

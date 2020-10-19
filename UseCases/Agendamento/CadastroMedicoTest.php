@@ -43,11 +43,13 @@ class CadastroMedicoTest extends \PHPUnit\Framework\TestCase
         );
     }
     
-    private function newDTO($nome, $horariosDisponiveis)
+    private function newDTO($id, $nome, $desativado, $horariosDisponiveis)
     {
         $dto = new CadastroMedicoDTO();
 
-        $dto->setNome($nome);
+        $dto->setId($id)
+            ->setNome($nome)
+            ->setDesativado($desativado);
 
         if(is_array($horariosDisponiveis)){
             $dto->setHorariosDisponiveis(...$horariosDisponiveis);
@@ -55,19 +57,20 @@ class CadastroMedicoTest extends \PHPUnit\Framework\TestCase
         return $dto;
     }
 
-    private function newHorarioDisponivel($inicio, $fim)
+    private function newHorarioDisponivel($diaSemana, $inicio, $fim)
     {
         $horario1 = new HorarioDisponivel();
-        return $horario1->setDiaSemana(2)
+        return $horario1->setDiaSemana($diaSemana)
                         ->setInicio($inicio)
                         ->setFim($fim);
     }
 
-    private function newMedico($id, $nome, $horariosDisponiveis)
+    private function newMedico($id, $nome, $desativado, $horariosDisponiveis)
     {
         $medico = new Medico();
         $medico->setId($id)
-               ->setNome($nome);
+               ->setNome($nome)
+               ->setDesativado($desativado);
 
         if(is_array($horariosDisponiveis)){
             $medico->setHorariosDisponiveis(...$horariosDisponiveis);
@@ -80,18 +83,20 @@ class CadastroMedicoTest extends \PHPUnit\Framework\TestCase
         $medico = $this->newMedico(
             null,
             "Saulo",
+            false,
             [
-                $this->newHorarioDisponivel("8:00", "18:00"),
-                $this->newHorarioDisponivel("09:00", "14:00")
+                $this->newHorarioDisponivel(2, "8:00", "18:00"),
+                $this->newHorarioDisponivel(2, "09:00", "14:00")
             ]
         );
 
         $medicoAposSave = $this->newMedico(
             123,
             "Saulo",
+            false,
             [
-                $this->newHorarioDisponivel("8:00", "18:00"),
-                $this->newHorarioDisponivel("09:00", "14:00")
+                $this->newHorarioDisponivel(2, "8:00", "18:00"),
+                $this->newHorarioDisponivel(2, "09:00", "14:00")
             ]
         );
 
@@ -104,7 +109,9 @@ class CadastroMedicoTest extends \PHPUnit\Framework\TestCase
         $sut = $this->newSut();
 
         $dto = $this->newDTO(
+            null,
             $medico->getNome(),
+            false,
             $medico->getHorariosDisponiveis(),
         );
 
@@ -121,10 +128,12 @@ class CadastroMedicoTest extends \PHPUnit\Framework\TestCase
         $sut = $this->newSut();
 
         $dto = $this->newDTO(
+            null,
             "Jefferson",
+            false,
             [
-                $this->newHorarioDisponivel("8:00", "18:00"),
-                $this->newHorarioDisponivel("09:00", "14:00")
+                $this->newHorarioDisponivel(2, "8:00", "18:00"),
+                $this->newHorarioDisponivel(2, "09:00", "14:00")
             ]
         );
 
@@ -133,4 +142,36 @@ class CadastroMedicoTest extends \PHPUnit\Framework\TestCase
 
         $sut->execute($dto);
     }
+
+    public function testDeveAtualizarEDesativarMedico()
+    {
+        $medicoAtualizado = $this->newMedico(
+            123456,
+            "Eduardo Silva",
+            true,
+            [
+                $this->newHorarioDisponivel(2, "8:00", "18:00"),
+                $this->newHorarioDisponivel(2, "09:00", "14:00"),
+                $this->newHorarioDisponivel(3, "18:00", "19:00")
+            ]
+        );
+
+        $this->doubleMedicosRepository
+             ->expects($this->once())
+             ->method('save')
+             ->with($medicoAtualizado)
+             ->willReturn($medicoAtualizado);
+
+        $sut = $this->newSut();
+
+        $dto = $this->newDTO(
+            $medicoAtualizado->getId(),
+            $medicoAtualizado->getNome(),
+            $medicoAtualizado->getDesativado(),
+            $medicoAtualizado->getHorariosDisponiveis(),
+        );
+
+        $sut->execute($dto);
+    }
+
 }

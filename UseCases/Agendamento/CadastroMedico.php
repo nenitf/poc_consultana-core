@@ -38,7 +38,8 @@ class CadastroMedico
 
         $medico = new Medico();
         $medico->setId($dto->getId())
-               ->setNome($dto->getNome());
+               ->setNome($dto->getNome())
+               ->setDesativado($dto->getDesativado());
 
         if(is_array($dto->getHorariosDisponiveis())){
             $medico->setHorariosDisponiveis(...$dto->getHorariosDisponiveis());

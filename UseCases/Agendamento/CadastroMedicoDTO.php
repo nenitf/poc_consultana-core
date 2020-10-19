@@ -11,6 +11,7 @@ class CadastroMedicoDTO
     private $id;
     private $nome;
     private $horariosDisponiveis;
+    private $desativado;
 
     public function getId() {
         return $this->id;
@@ -42,10 +43,22 @@ class CadastroMedicoDTO
         return $this;
     }
 
+    public function getDesativado() {
+        return $this->desativado;
+    }
+
+    public function setDesativado(bool $desativado) {
+        $this->desativado = $desativado;
+        return $this;
+    }
+
     public function valida()
     {
         if(is_null($this->nome))
             throw new ValidationException('Nome é obrigatório');
+
+        if(is_null($this->desativado))
+            throw new ValidationException('Desativado é obrigatório');
     }
 }
 
