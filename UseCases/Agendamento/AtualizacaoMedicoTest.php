@@ -1,8 +1,8 @@
 <?php
 
 use Core\UseCases\Agendamento\{
-    CadastroMedico,
-    CadastroMedicoDTO,
+    AtualizacaoMedico,
+    AtualizacaoMedicoDTO,
 };
 
 use Core\Exceptions\{
@@ -19,7 +19,7 @@ use Core\Contracts\Repositories\{
     IMedicosRepository,
 };
 
-class CadastroMedicoTest extends \PHPUnit\Framework\TestCase
+class AtualizacaoMedicoTest extends \PHPUnit\Framework\TestCase
 {
     private $doubleMedicosRepository;
 
@@ -38,16 +38,17 @@ class CadastroMedicoTest extends \PHPUnit\Framework\TestCase
 
     private function newSut()
     {
-        return new CadastroMedico(
+        return new AtualizacaoMedico(
             $this->doubleMedicosRepository,
         );
     }
     
-    private function newDTO($nome, $horariosDisponiveis)
+    private function newDTO($id, $nome, $horariosDisponiveis)
     {
-        $dto = new CadastroMedicoDTO();
+        $dto = new AtualizacaoMedicoDTO();
 
-        $dto->setNome($nome);
+        $dto->setId($id)
+            ->setNome($nome);
 
         if(is_array($horariosDisponiveis)){
             $dto->setHorariosDisponiveis(...$horariosDisponiveis);
@@ -55,10 +56,10 @@ class CadastroMedicoTest extends \PHPUnit\Framework\TestCase
         return $dto;
     }
 
-    private function newHorarioDisponivel($inicio, $fim)
+    private function newHorarioDisponivel($diaSemana, $inicio, $fim)
     {
         $horario1 = new HorarioDisponivel();
-        return $horario1->setDiaSemana(2)
+        return $horario1->setDiaSemana($diaSemana)
                         ->setInicio($inicio)
                         ->setFim($fim);
     }
@@ -75,38 +76,40 @@ class CadastroMedicoTest extends \PHPUnit\Framework\TestCase
         return $medico;
     }
 
-    public function testDeveCadastrarMedico()
+    public function testDeveAtualizarMedico()
     {
         $medico = $this->newMedico(
-            null,
-            "Saulo",
-            [
-                $this->newHorarioDisponivel("8:00", "18:00"),
-                $this->newHorarioDisponivel("09:00", "14:00")
-            ]
-        );
-
-        $medicoAposSave = $this->newMedico(
             123,
             "Saulo",
             [
-                $this->newHorarioDisponivel("8:00", "18:00"),
-                $this->newHorarioDisponivel("09:00", "14:00")
+                $this->newHorarioDisponivel(2, "8:00", "18:00"),
+                $this->newHorarioDisponivel(2, "09:00", "14:00")
             ]
+        );
+
+        $dto = $this->newDTO(
+            $medico->getId(),
+            "Saulo Jr",
+            [
+                $this->newHorarioDisponivel(3, "8:00", "18:00"),
+                $this->newHorarioDisponivel(3, "09:00", "14:00"),
+                $this->newHorarioDisponivel(3, "15:00", "16:00")
+            ]
+        );
+
+        $medicoAtualizado = $this->newMedico(
+            $medico->getId(),
+            $dto->getNome(),
+            $dto->getHorariosDisponiveis()
         );
 
         $this->doubleMedicosRepository
              ->expects($this->once())
              ->method('save')
-             ->with($medico)
-             ->willReturn($medicoAposSave);
+             ->with($medicoAtualizado)
+             ->willReturn($medico);
 
         $sut = $this->newSut();
-
-        $dto = $this->newDTO(
-            $medico->getNome(),
-            $medico->getHorariosDisponiveis(),
-        );
 
         $sut->execute($dto);
     }
@@ -121,10 +124,11 @@ class CadastroMedicoTest extends \PHPUnit\Framework\TestCase
         $sut = $this->newSut();
 
         $dto = $this->newDTO(
+            123,
             "Jefferson",
             [
-                $this->newHorarioDisponivel("8:00", "18:00"),
-                $this->newHorarioDisponivel("09:00", "14:00")
+                $this->newHorarioDisponivel(4, "8:00", "18:00"),
+                $this->newHorarioDisponivel(4, "09:00", "14:00")
             ]
         );
 

@@ -6,10 +6,20 @@ use Core\Exceptions\ValidationException;
 
 use Core\Models\HorarioDisponivel;
 
-class CadastroMedicoDTO
+class AtualizacaoMedicoDTO
 {
+    private $id;
     private $nome;
     private $horariosDisponiveis;
+
+    public function getId() {
+        return $this->id;
+    }
+
+    public function setId(int $id) {
+        $this->id = $id;
+        return $this;
+    }
 
     public function getNome() {
         return $this->nome;
@@ -34,6 +44,9 @@ class CadastroMedicoDTO
 
     public function valida()
     {
+        if(is_null($this->id))
+            throw new ValidationException('Id é obrigatório');
+
         if(is_null($this->nome))
             throw new ValidationException('Nome é obrigatório');
     }
