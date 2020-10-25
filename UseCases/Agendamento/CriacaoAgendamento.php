@@ -27,8 +27,10 @@ class CriacaoAgendamento {
 
     public function execute(CriacaoAgendamentoDTO $dto)
     {
-        if(!$dto->validado()){
-            throw new AppException("Faltam parâmetros para criar agendamento");
+        try {
+            $dto->valida();
+        } catch (ValidationException $e) {
+            throw new AppException($e->getMessage());
         }
 
         $medico = $this->medicosRepository->findById($dto->getIdMedico());
