@@ -5,7 +5,7 @@
         "test:group": "php tests/_tools/composer-test.php --group",
         "test:cover": "php tests/_tools/composer-phpunit.php --coverage-text --coverage-html tests/_reports/coverage",
         "test:dox": "php tests/_tools/composer-phpunit.php --testdox",
-        "test:dox:filter": "php tests/_tools/composer-phpunit.php --filter --testdox",
+        "test:dox:filter": "php tests/_tools/composer-phpunit.php --testdox --filter",
         "test:dox:group": "php tests/_tools/composer-test.php --testdox --group",
         "test:dox:cover": "php tests/_tools/composer-phpunit.php --coverage-text --coverage-html tests/_reports/coverage --testdox"
     },
