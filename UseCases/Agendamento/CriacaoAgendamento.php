@@ -33,6 +33,14 @@ class CriacaoAgendamento {
 
         $medico = $this->medicosRepository->findById($dto->getIdMedico());
 
+        if(is_null($medico)){
+            throw new AppException("Médico não encontrado");
+        }
+
+        if($medico->getDesativado()){
+            throw new AppException("Não é possível consultar com médico desativado");
+        }
+
         $horariosUteis = $medico->getHorariosDisponiveis();
 
         $horarioTrabalhavel = false;
